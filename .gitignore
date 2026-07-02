@@ -1,0 +1,35 @@
+# Data
+data/raw/
+data/processed/*.npy
+data/processed/*.pt
+
+# Checkpoints y experimentos pesados
+experiments/**/checkpoints/
+experiments/**/*.pth
+experiments/**/*.ckpt
+*.pt
+*.pth
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+wandb/
+lightning_logs/
