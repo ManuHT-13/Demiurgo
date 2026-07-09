@@ -1,3 +1,8 @@
+# Si tu "nvidia-smi" muestra una CUDA Version distinta a 12.8 
+# (se puede ver con nvidia-smi en la cmd), cambia "cu128" por 
+# la que corresponda (p.ej. cu126, cu124)
+--extra-index-url https://download.pytorch.org/whl/cu128
+
 numpy
 pandas
 torch

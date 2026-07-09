@@ -10,12 +10,12 @@ groups the samples into batches, and feeds them to the neural network
 """
 
 from pathlib import Path
-
+ 
 import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
-
+ 
 
 class CIFAR10SupervisedDataset(Dataset):
     """
@@ -31,17 +31,52 @@ class CIFAR10SupervisedDataset(Dataset):
 
         #  Read the labels CSV file using pandas (a table similar to Excel)
         df = pd.read_csv(labels_path)
+
+        # CASE 1: The CSV includes a column indicating whether each row belongs to the
+        # training or test set
+        split_col = None
+        for candidate in ("split", "set", "subset"):
+            if candidate in df.columns:
+                split_col = candidate
+                break
+ 
+        if split_col is not None:
+            wanted_split = "train" if "train" in images_path.stem else "test"
+            df = df[df[split_col].astype(str).str.lower() == wanted_split].reset_index(drop=True)
+ 
         if "label" in df.columns:
             self.labels = df["label"].to_numpy()
         else:
             self.labels = df.select_dtypes(include="number").iloc[:, -1].to_numpy()
 
+        # CASE 2: There was no split column, but the CSV has more rows
+        # than images: first the 50,000 training rows, then the 10,000 test rows
+        # If we are loading train_images.npy, we keep
+        # the first N rows; if it is test_images.npy, we keep the last N
+        if len(self.labels) != len(self.images) and len(self.labels) > len(self.images):
+            n = len(self.images)
+            if "train" in images_path.stem:
+                print(
+                    f"[dataset.py] WARNING: labels.csv has {len(self.labels)} rows "
+                    f"and the images {n}. Asuming the first {n} csv rows "
+                    f"belong to the train split."
+                )
+                self.labels = self.labels[:n]
+            else:
+                print(
+                    f"[dataset.py] WARNING: labels.csv has {len(self.labels)} rows "
+                    f"and the images {n}. Asuming the first {n} csv rows "
+                    f"belong to the test split."
+                )
+                self.labels = self.labels[-n:]
+ 
         assert len(self.images) == len(self.labels), (
-            f"Mismatch: {len(self.images)} images vs "
-            f"{len(self.labels)} labels. Check the output of "
-            f"prepare_dataset.py; something is inconsistent."
+            f"Descuadre: {len(self.images)} imágenes vs "
+            f"{len(self.labels)} etiquetas. Revisa la salida de "
+            f"prepare_dataset.py, algo no encaja. Columnas del csv: "
+            f"{df.columns.tolist()}"
         )
-
+ 
         self.transform = transform
 
     def __len__(self):
