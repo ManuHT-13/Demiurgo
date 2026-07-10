@@ -83,7 +83,7 @@ def build_dataloaders(cfg):
     training converge faster and more stably
     """
 
-    mean = (0.4914, 0.4822, 0.4465)
+    mean = (0.4914, 0.4822, 0.4465) #TODO que las calcule
     std = (0.2470, 0.2435, 0.2616)
 
     train_transform = transforms.Compose([
