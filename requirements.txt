@@ -8,3 +8,5 @@ pandas
 torch
 torchvision
 pyyaml
+scikit-learn
+matplotlib
