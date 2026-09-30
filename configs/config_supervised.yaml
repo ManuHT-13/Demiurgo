@@ -9,6 +9,8 @@ experiment_name: "resnet18_supervised_correct"
 data:
   images_path: "data/raw/train_images.npy"
   labels_path: "data/raw/labels.csv"
+  test_images_path: "data/raw/test_images.npy"
+  test_labels_path: "data/raw/labels.csv"
   val_split: 0.1        # Reserve 10% of the training images for validation
   batch_size: 128       # Increase or decrease depending on your available VRAM (6 GB -> 128 should work well)
   num_workers: 2        # Number of parallel processes for data loading; 2–4 usually works well on a Ryzen 5 3600
@@ -16,6 +18,17 @@ data:
 model:
   num_classes: 10
   pretrained: false     # Train from scratch. See the explanation in src/models/resnet.py
+  class_names:
+    - airplane
+    - automobile
+    - bird
+    - cat
+    - deer
+    - dog
+    - frog
+    - horse
+    - ship
+    - truck
 
 training:
   epochs: 50            # Start with 50 epochs to inspect the learning curve; increase if performance is still improving
@@ -24,7 +37,13 @@ training:
   weight_decay: 0.0005  # Regularization term that helps prevent overfitting
   mixed_precision: true # Use float16 where possible to reduce VRAM usage and speed up training
   seed: 42
+  early_stopping:
+    enabled: true
+    patience: 10      # number of consecutive epochs without real improvement before stopping
+    min_delta: 0.05   # minimum improvement in val_acc (percentage points) to count as "real improvement"
 
 output:
   checkpoints_dir: "experiments/resnet18_supervised_correct/checkpoints"
   logs_dir: "experiments/resnet18_supervised_correct/logs"
+  figures_dir: "experiments/resnet18_supervised_correct/figures"
+  stats_cache_path: "data/processed/channel_stats_train.json"
